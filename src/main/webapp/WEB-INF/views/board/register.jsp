@@ -183,7 +183,7 @@
 				showUploadFile(data);
 			}).catch((e)=>{
 				console.warn(e);
-			})
+			});
 		}
 		
 		function showUploadFile(uploadResultArr){
