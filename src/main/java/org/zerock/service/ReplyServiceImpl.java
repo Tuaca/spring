@@ -54,6 +54,16 @@ public class ReplyServiceImpl implements ReplyService{
 		return mapper.delete(rno);
 	}
 	
+	@Transactional
+	@Override
+	public int remove(ReplyVO vo) {
+		System.out.println("remove......" + vo);
+		boardMapper.updateReplyCnt(vo.getBno(), -1);
+		Long rno = vo.getRno();
+		
+		return mapper.delete(rno);
+	}
+	
 	@Override
 	public List<ReplyVO> getList(Criteria cri, Long bno){
 		System.out.println("get Reply List of a Board " + bno);

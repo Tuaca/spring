@@ -144,6 +144,7 @@
 		const regExp = new RegExp("(.*?)\.(exe|sh|arz)$");
 		const maxSize = 5242880; // 5MB
 		const bno = ${board.bno};
+		const csrfToken = "${_csrf.token}";
 		
 		// 기존 업로드 파일 불러오기
 		fetch('/board/getAttachList?bno=' + bno)
@@ -247,6 +248,7 @@
 			}
 			
 			fetch("/uploadAjaxAction", {
+				headers:{'X-CSRF-Token':csrfToken,},
 				method:'POST',
 				cache:'no-cache',
 				body:formData
@@ -308,6 +310,7 @@
 					fetch('/deleteFile', {
 						headers:{
 							'Content-Type':'application/json',
+							'X-CSRF-Token':csrfToken,
 						},
 						method:'POST',
 						cache:'no-cache',

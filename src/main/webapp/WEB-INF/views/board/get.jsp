@@ -186,7 +186,7 @@
 				</div>
 				<div class='form-group'>
 					<label>Replyer</label>
-					<input class='form-control' name='replyer' value='reypler'>
+					<input class='form-control' name='replyer' value='replyer'>
 				</div>
 				<div class='form-group'>
 					<label>Reply Date</label>
@@ -221,6 +221,17 @@
 		
 		const operForm = $("#operForm");
 		
+		let replyer = null;
+		<sec:authorize access="isAuthenticated()">
+			replyer = '<sec:authentication property="principal.username"/>';
+		</sec:authorize>
+		const csrfHeaderName = "${_csrf.headerName}"
+		const csrfToken = "${_csrf.token}";
+		
+		$(document).ajaxSend(function(e,xhr,options){
+			xhr.setRequestHeader(csrfHeaderName,csrfToken);
+		});
+		
 		// 게시물 수정 화면으로 이동
 		$("button[data-oper='modify']").on("click", function(e) {
 			operForm.attr("action", "/board/modify").submit();
@@ -247,6 +258,7 @@
 		//댓글 등록 모달창 띄우기
 		$("#addReplyBtn").on("click", function(e){
 			modal.find("input").val("");
+			modal.find("input[name='replyer']").val(replyer);
 			modalInputReplyDate.closest("div").hide();
 			modal.find("button[id !='modalCloseBtn']").hide();
 			
@@ -275,8 +287,17 @@
 		// 댓글 수정, 삭제 모달창 띄우기
 		$(".chat").on("click", "li", function(e){
 			const rno = $(this).data("rno");
-			
+			if(!replyer){
+				alert("로그인이 필요한 서비스입니다.");
+				modal.modal("hide");
+				return;
+			}
 			replyService.get(rno, function(reply){
+				if(replyer != reply.replyer){
+					alert("자신이 작성한 댓글만 수정이 가능합니다.");
+					modal.modal("hide");
+					return;
+				}
 				modalInputReply.val(reply.reply);
 				modalInputReplyer.val(reply.replyer).attr("readonly","readonly");
 				modalInputReplyDate.val(replyService.displayTime(reply.replyDate)).attr("readonly","readonly");
@@ -292,7 +313,8 @@
 		
 		// 댓글 수정
 		modalModBtn.on("click",function(e){
-			const reply = {rno:modal.data("rno"),reply:modalInputReply.val()};
+			const originalReplyer = modalInputReplyer.val();
+			const reply = {rno:modal.data("rno"),reply:modalInputReply.val(),replyer:originalReplyer};
 			replyService.update(reply, function(result){
 				alert(result);
 				modal.modal("hide");
@@ -302,8 +324,9 @@
 		
 		// 댓글 삭제
 		modalRemoveBtn.on("click",function(e){
+			const originalReplyer = modalInputReplyer.val();
 			const rno = modal.data("rno");
-			replyService.remove(rno, function(result){
+			replyService.remove(rno,originalReplyer, function(result){
 				alert(result);
 				modal.modal("hide");
 				showList(pageNum);

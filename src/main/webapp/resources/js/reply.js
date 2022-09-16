@@ -25,10 +25,12 @@ const replyService = (function(){
 		});
 	}
 	
-	function remove(rno,callback,error){
+	function remove(rno,replyer,callback,error){
 		$.ajax({
 			type:'delete',
 			url:'/replies/' + rno,
+			data: JSON.stringify({rno:rno,replyer:replyer}),
+			contentType:"application/json; charset=UTF-8",
 			success:function(deleteResult,stauts,xhr){if(callback)callback(deleteResult);},
 			error:function(xhr,status,er){if(error)error(er);}
 		});

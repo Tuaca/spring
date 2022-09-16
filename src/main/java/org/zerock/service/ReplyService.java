@@ -14,6 +14,7 @@ public interface ReplyService {
 	public int modify(ReplyVO vo);
 	
 	public int remove(Long rno);
+	public int remove(ReplyVO vo);
 	
 	public List<ReplyVO> getList(Criteria cri,Long bno);
 	

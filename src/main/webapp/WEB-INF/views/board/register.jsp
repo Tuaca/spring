@@ -119,6 +119,8 @@
 		const uploadResult = document.querySelector('.uploadResult ul');
 		const regExp = new RegExp("(.*?)\.(exe|sh|arz)$");
 		const maxSize = 5242880; // 5MB
+		const csrfToken = "${_csrf.token}";
+		
 		function checkExtension(fileName,fileSize){
 			if(fileSize >= maxSize){
 				alert("업로드할 파일은 5MB 이하여야 합니다");
@@ -170,6 +172,7 @@
 			}
 			
 			fetch("/uploadAjaxAction", {
+				headers:{'X-CSRF-Token':csrfToken,},
 				method:'POST',
 				cache:'no-cache',
 				body:formData
@@ -231,6 +234,7 @@
 					fetch('/deleteFile', {
 						headers:{
 							'Content-Type':'application/json',
+							'X-CSRF-Token':csrfToken,
 						},
 						method:'POST',
 						cache:'no-cache',
